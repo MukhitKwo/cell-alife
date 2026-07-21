@@ -3,7 +3,7 @@ export class Square {
 	y: number;
 	size: number = 20;
 	angle: number = 0;
-	color: string = "#4dabf7";
+	color: string = "#964B00";
     ctx: CanvasRenderingContext2D;
 
 	constructor(x: number, y: number, ctx: CanvasRenderingContext2D) {

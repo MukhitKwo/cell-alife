@@ -6,7 +6,12 @@ const ctx = canvas.getContext('2d')!;
 
 const size = 20
 
-const square1 = new Square(canvas.width / 2, canvas.height / 2, ctx);
+const squares: Square[] = [
+  new Square(canvas.width / 2, canvas.height / 2, ctx),
+  new Square(canvas.width / 2, canvas.height / 3, ctx),
+  new Square(canvas.width / 3, canvas.height / 2, ctx),
+  new Square(canvas.width / 3, canvas.height / 3, ctx)
+];
 
 const child = {
   offsetX: 0, // distance from parent's center, to the right
@@ -23,19 +28,23 @@ function drawSquare(square: Square) {
   ctx.fillStyle = square.color;
   ctx.fillRect(-square.size / 2, -square.size / 2, square.size, square.size);
   
-  ctx.fillStyle = 'orange';
+  ctx.fillStyle = '#E75480';
   ctx.fillRect(child.offsetX - child.size / 2, child.offsetY - child.size / 2, child.size, child.size);
 
   ctx.restore();
 }
 
 function update() {
-  square1.updateSquare();
+  for (const square of squares) {
+    square.updateSquare();
+  }
 }
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawSquare(square1);
+  for (const square of squares) {
+    drawSquare(square);
+  }
 }
 
 function loop() {
