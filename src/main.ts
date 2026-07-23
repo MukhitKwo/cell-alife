@@ -9,7 +9,7 @@ await app.init({ resizeTo: window });
 
 document.getElementById('simulation')!.appendChild(app.canvas);
 
-const cell_count = 5;
+const cell_count = 1;
 const resource_count = 5;
 
 const cells: Cell[] = Array.from(
