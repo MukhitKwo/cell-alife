@@ -4,7 +4,7 @@ import { Resource } from "./resource";
 import { key } from "../utils/key";
 import { PointPosition } from "./pointPosition";
 
-export class Cell {
+export class Organism {
 	position: Point;
 	angle: number = Math.random() * Math.PI * 2;
 	speed: number = 1;

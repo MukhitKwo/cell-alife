@@ -1,6 +1,6 @@
 import { Application } from "pixi.js";
 import "./style.css";
-import { Cell } from "./classes/cell";
+import { Organism } from "./classes/organism";
 import { Resource } from "./classes/resource";
 import { key } from "./utils/key";
 
@@ -35,7 +35,7 @@ function addToGrid(resource: Resource) {
 	grid.get(k)!.push(resource);
 }
 
-const cells: Cell[] = Array.from({ length: cell_count }, () => new Cell(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT, grid, resources));
+const cells: Organism[] = Array.from({ length: cell_count }, () => new Organism(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT, grid, resources));
 
 app.stage.addChild(...resources.map((b) => b.graphic), ...cells.map((b) => b.graphic));
 
