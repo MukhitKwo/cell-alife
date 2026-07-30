@@ -1,17 +1,16 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Point } from "pixi.js";
 
 export class Resource {
-	x: number;
-	y: number;
+	position: Point;
 	size: number = 10;
 	graphic: Graphics = new Graphics();
 	color: string = "#00ff00";
 
     constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+        this.position = new Point(x, y);
         this.graphic.circle(-this.size / 2, -this.size / 2, this.size).fill(this.color);
-        this.graphic.x = this.x;
-		this.graphic.y = this.y;
+        this.graphic.position = this.position;
+        // this.graphic.position.set(x, y);
+        // this.graphic.position.copyFrom(this.position);
     }
 }

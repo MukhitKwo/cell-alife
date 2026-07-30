@@ -15,18 +15,18 @@ const CANVAS_HEIGHT = app.canvas.height;
 
 const grid = new Map<string, Resource[]>();
 
-const resource_count = 50;
-const cell_count = 1;
+const resource_count = 1000;
+const cell_count = 1	;
 
 const resources: Resource[] = Array.from({ length: resource_count }, () => {
-	const r = new Resource(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT);
-	addToGrid(r.x, r.y, r);
-	return r;
+	const resource = new Resource(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT);
+	addToGrid(resource);
+	return resource;
 });
 
-function addToGrid(x: number, y: number, resource: Resource) {
+function addToGrid(resource: Resource) {
 
-	const k = key(x, y, 200);
+	const k = key(resource.position);
 
 	if (!grid.has(k)) {
 		grid.set(k, []);
