@@ -1,7 +1,6 @@
 import { Graphics, Point } from "pixi.js";
-import { hexagonPoints } from "../utils/hex";
 import { Resource } from "./resource";
-import { key } from "../utils/key";
+import { normalizeToKey, toKey } from "../utils/key";
 import { PointPosition } from "./pointPosition";
 
 export class Organism {
@@ -14,34 +13,22 @@ export class Organism {
 	color: string = "#964B00";
 
 	SQRT3_OVER_2 = Math.sqrt(3) / 2;
-	movement_inner_radius: number = 50;
-	movement_outer_radius: number = 100;
+	movement_inner_radius: number = 100;
+	movement_outer_radius: number = 200;
 
 	grid: Map<string, Resource[]>;
 	resources: Resource[];
 
 	constructor(x: number, y: number, grid: Map<string, Resource[]>, resources: Resource[]) {
 		this.position = new Point(x, y);
+		this.objetive = new PointPosition(x, y);
+
+		this.graphic.circle(0, 0, 20).fill({ color: "#0000ff" });
+		this.graphic.circle(0, 0, this.movement_inner_radius).stroke({ width: 1, color: "#0000ff" });
+		this.graphic.circle(0, 0, this.movement_outer_radius).stroke({ width: 1, color: "#ff0000" });
+
 		this.grid = grid;
 		this.resources = resources;
-
-		const child = {
-			offsetX: this.size / 2,
-			offsetY: this.size * this.SQRT3_OVER_2,
-			size: this.size,
-		};
-
-		//todo refactor and make 1-6 position based
-		this.graphic.poly(hexagonPoints(this.size, 0, 0)).fill(this.color);
-		this.graphic.poly(hexagonPoints(child.size, -child.offsetX, -child.offsetY)).fill("#E75480");
-		this.graphic.poly(hexagonPoints(child.size, -child.offsetX, child.offsetY)).fill("#E74506");
-		this.graphic.poly(hexagonPoints(child.size, -child.size, 0)).fill("#E74506");
-		this.graphic.poly(hexagonPoints(child.size, -child.size * 2, 0)).fill("#E74506");
-		this.graphic.circle(0, 0, 50).stroke({ width: 1, color: "#0000ff" });
-		this.graphic.circle(0, 0, 100).stroke({ width: 1, color: "#0000ff" });
-		this.graphic.circle(0, 0, 200).stroke({ width: 1, color: "#ff0000" });
-
-		this.objetive = this.randomPositionFrontOfCell(this.movement_inner_radius, this.movement_outer_radius);
 	}
 
 	randomPositionFrontOfCell(inner_radius: number, outer_radius: number): PointPosition {
@@ -55,19 +42,30 @@ export class Organism {
 		return new PointPosition(new_x, new_y);
 	}
 
-	//! fix and move ================================
-	getClosestResource(key: string): Resource | undefined {
-		if (this.grid.has(key)) {
-			const resources = this.grid.get(key);
+	getClosestResource(current_position: Point): Resource | undefined {
+		const normaziledKey = normalizeToKey(current_position);
 
-			if (resources) {
-				const closest = this.getClosest(this.position, resources);
+		let list_of_resources: Resource[] = [];
 
-				return closest;
+		for (let x = normaziledKey.x - 1; x <= normaziledKey.x + 1; x++) {
+			for (let y = normaziledKey.y - 1; y <= normaziledKey.y + 1; y++) {
+				const key = `${x},${y}`;
+
+				if (this.grid.has(key)) {
+					const resources = this.grid.get(key);
+
+					if (resources) {
+						list_of_resources.push(...resources);
+					}
+				}
 			}
 		}
 
-		return undefined;
+		console.log(list_of_resources);
+
+		const closest = this.getClosest(this.position, list_of_resources);
+
+		return closest;
 	}
 
 	getClosest(target: Point, items: Resource[]): Resource | undefined {
@@ -85,34 +83,35 @@ export class Organism {
 		const dy = a.y - b.y;
 		return dx * dx + dy * dy;
 	}
-	//!===============================
 
 	updatePosition(): void {
 		const dist_to_objetive = Math.hypot(this.objetive.position.x - this.position.x, this.objetive.position.y - this.position.y);
 
 		if (dist_to_objetive < 1) {
 			if (this.objetive instanceof Resource) {
-				const k = key(this.objetive.position);
+				const k = toKey(this.objetive.position);
 
-				const updated_gird_cell = this.grid.get(k)!.filter((r) => r !== this.objetive);
+				// remove resource and create new updated grid cell
+				const updated_grid_cell = this.grid.get(k)!.filter((r) => r !== this.objetive);
 
-				if (updated_gird_cell.length === 0) {
+				// delete cell if empty
+				if (updated_grid_cell.length === 0) {
 					this.grid.delete(k);
 				} else {
-					this.grid.set(k, updated_gird_cell);
+					// else update with new count
+					this.grid.set(k, updated_grid_cell);
 				}
 
+				// remove resouce from total list of resources
 				const index = this.resources.indexOf(this.objetive);
 				this.resources.splice(index, 1);
 
+				// remove resource from graphic list and destory it
 				this.objetive.graphic.parent?.removeChild(this.objetive.graphic);
 				this.objetive.graphic.destroy();
 			}
 
-			const k = key(this.position);
-
-			const closestResource = this.getClosestResource(k);
-			console.log(closestResource);
+			const closestResource = this.getClosestResource(this.position);
 
 			if (closestResource) {
 				this.objetive = closestResource;
@@ -133,7 +132,7 @@ export class Organism {
 	}
 
 	updateRenderParams() {
-		this.graphic.position = this.position;
+		this.graphic.position.copyFrom(this.position);
 		this.graphic.rotation = this.angle;
 	}
 }

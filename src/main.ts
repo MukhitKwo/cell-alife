@@ -2,7 +2,7 @@ import { Application } from "pixi.js";
 import "./style.css";
 import { Organism } from "./classes/organism";
 import { Resource } from "./classes/resource";
-import { key } from "./utils/key";
+import { toKey } from "./utils/key";
 
 const app = new Application();
 
@@ -15,8 +15,8 @@ const CANVAS_HEIGHT = app.canvas.height;
 
 const grid = new Map<string, Resource[]>();
 
-const resource_count = 1000;
-const cell_count = 1	;
+const resource_count = 25;
+const cell_count = 1;
 
 const resources: Resource[] = Array.from({ length: resource_count }, () => {
 	const resource = new Resource(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT);
@@ -26,7 +26,7 @@ const resources: Resource[] = Array.from({ length: resource_count }, () => {
 
 function addToGrid(resource: Resource) {
 
-	const k = key(resource.position);
+	const k = toKey(resource.position);
 
 	if (!grid.has(k)) {
 		grid.set(k, []);
@@ -35,7 +35,7 @@ function addToGrid(resource: Resource) {
 	grid.get(k)!.push(resource);
 }
 
-const cells: Organism[] = Array.from({ length: cell_count }, () => new Organism(Math.random() * CANVAS_WIDTH, Math.random() * CANVAS_HEIGHT, grid, resources));
+const cells: Organism[] = Array.from({ length: cell_count }, () => new Organism(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, grid, resources));
 
 app.stage.addChild(...resources.map((b) => b.graphic), ...cells.map((b) => b.graphic));
 
