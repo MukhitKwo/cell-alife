@@ -2,7 +2,7 @@ import { Application } from "pixi.js";
 import "./style.css";
 import { Organism } from "./classes/organism";
 import { Resource } from "./classes/resource";
-import { toKey } from "./utils/key";
+import { getKeyString } from "./utils/key";
 
 const app = new Application();
 
@@ -26,7 +26,7 @@ const resources: Resource[] = Array.from({ length: resource_count }, () => {
 
 function addToGrid(resource: Resource) {
 
-	const k = toKey(resource.position);
+	const k = getKeyString(resource.position);
 
 	if (!grid.has(k)) {
 		grid.set(k, []);
