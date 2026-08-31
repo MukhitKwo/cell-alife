@@ -25,7 +25,6 @@ const resources: Resource[] = Array.from({ length: resource_count }, () => {
 });
 
 function addToGrid(resource: Resource) {
-
 	const k = getKeyString(resource.position);
 
 	if (!grid.has(k)) {
@@ -40,7 +39,10 @@ const cells: Organism[] = Array.from({ length: cell_count }, () => new Organism(
 app.stage.addChild(...resources.map((b) => b.graphic), ...cells.map((b) => b.graphic));
 
 function update() {
-	cells.forEach((b) => b.updatePosition());
+	cells.forEach((b) => {
+		b.updatePosition();
+		b.updateRenderParams();
+	});
 }
 
 function loop() {
